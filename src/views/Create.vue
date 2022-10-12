@@ -40,12 +40,7 @@
             />
           </div>
           <div class="date">
-            <input
-              id="date"
-              v-model="item.date"
-              type="date"
-              placeholder="Enter a date"
-            />
+            <input id="date" v-model="item.date" type="date" />
           </div>
           <span class="delete" @click="deleteTask(item.id)"
             ><img src="../assets/images/delete.svg" alt="Done icon"

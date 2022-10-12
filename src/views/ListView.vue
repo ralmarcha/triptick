@@ -1,89 +1,178 @@
 <template>
   <div id="homeContainer">
-    <!-- 2. (NewTask, TaskItem, Footer, Nav) components are used here!  -->
     <NewNav />
-    <Date />
-    <!-- 5. NewTask component will receive a customEvent on this instance of the homeView that will fire the add-to-do function -->
-    <div id="tasks">
-      <NewTask @childNewTask="addTaskTodo" />
-      <!-- 
-  7. TaskItem component will loop through the tasks-array that will print an individual instance of an individual TaskItem component. TaskItem will receive 3 customEvents on this instance of the homeView. 1 customEvent for toggling the task to show either a text or an icon to display if the task is completed or not completed. 1 customEevent for removing/deleting the task out of the array. 1 customEvent for editing the task title and description. -->
-      <div id="taskItem">
-        <TransitionGroup name="taskTran">
-          <TaskItem
-            v-for="(item, index) in taskArray"
-            :key="index"
-            :task="item"
-            @emitRemove="deleteTask"
-            @emitEdit="editTask"
-            @emitStatus="checkTask"
-          />
-        </TransitionGroup>
+    <div class="taskList">
+      <div v-if="statusMessage || errorMessage">
+        <p>{{ errorMessage }}</p>
+        <p>{{ statusMessage }}</p>
       </div>
+    </div>
+
+    <div v-if="dataLoaded">
+      <div>
+        <div class="edit" @click="editMode">
+          <img class="icon" src="../assets/images/edit.svg" alt="edit icon" />
+          <img
+            @click="deleteList"
+            class="icon"
+            src="../assets/images/delete.svg"
+            alt="delete icon"
+          />
+        </div>
+
+        <div class="newInputs">
+          <input v-if="edit" type="text" v-model="data.listName" />
+          <h1>{{ data.listName }}</h1>
+        </div>
+      </div>
+
+      <div
+        class="tasksView"
+        v-for="(item, index) in data.taskTitle"
+        :key="index"
+      >
+        <div>
+          <label for="task-name">Task</label>
+          <input
+            v-if="edit"
+            id="task"
+            v-model="item.task"
+            type="text"
+            placeholder="Enter a title"
+          />
+          <h3 v-else>{{ item.task }}</h3>
+        </div>
+        <div>
+          <label for="description">Description</label>
+          <input
+            v-if="edit"
+            id="description"
+            v-model="item.description"
+            type="text"
+            placeholder="Enter a description"
+          />
+          <h3 v-else>{{ item.description }}</h3>
+        </div>
+        <div>
+          <label for="date">Date</label>
+          <input v-if="edit" id="date" v-model="item.date" type="date" />
+          <h3 v-else>{{ item.date }}</h3>
+        </div>
+        <img
+          @click="deleteTask(item.id)"
+          v-if="edit"
+          class="icon"
+          src="../assets/images/delete.svg"
+          alt="delete icon"
+        />
+      </div>
+      <button @click="addNEwTask" v-if="edit" type="button">Add task</button>
+      <button @click="updateList" v-if="edit" type="button">Update List</button>
     </div>
     <Footer />
   </div>
 </template>
 
 <script setup>
-//1. ref() is used here!
-import NewTask from "../components/NewTask.vue";
-import TaskItem from "../components/TaskItem.vue";
-import { ref } from "vue";
+import { ref, computed } from "vue";
+import { supabase } from "../supabase";
+import { useRoute, useRouter } from "vue-router";
 import { useTaskStore } from "../stores/task";
+import { useUserStore } from "../stores/user";
 import NewNav from "../components/NewNav.vue";
 import Date from "../components/Date.vue";
 import Footer from "../components/Footer.vue";
+import { uid } from "uid";
 
-//lists
-async function groupList(task) {
-  const taskId = task.id;
-  const group = task.group;
-  await taskStore.groupList(group, taskId);
-  readFromStore();
-}
+const data = ref(null);
+const dataLoaded = ref(null);
+const statusMessage = ref(null);
+const errorMessage = ref(null);
+const route = useRoute();
+const router = useRouter();
+const currentId = route.params.listId;
+const getData = async () => {
+  try {
+    const { data: lists, error } = await supabase
+      .from("lists")
+      .select("*")
+      .eq("id", currentId);
+    if (error) throw error;
+    data.value = lists[0];
+    dataLoaded.value = true;
+  } catch (error) {
+    errorMessage.value = error.message;
+    setTimeout(() => {
+      errorMessage.value = false;
+    }, 3000);
+  }
+};
+getData();
 
-// nos definimos la tienda del usuario dentro de una constante
-const taskStore = useTaskStore();
-// 3. Tasks are going to be contained in an array here!
-let taskArray = ref([]);
+const edit = ref(null);
+const editMode = () => {
+  edit.value = !edit.value;
+};
 
-// 4. An async function is needed to get all of the tasks stored within the supabase database, this async function's body will contain the tasks value which be use to store the fetchTasks method which lives inside the userTaskStore. This function needs to be called within the setUp script in order to run within the first instance of this component lifecycle.
-async function readFromStore() {
-  taskArray.value = await taskStore.fetchTasks();
-}
-readFromStore();
+const deleteList = async () => {
+  try {
+    const { error } = await supabase.from("lists").delete().eq("id", currentId);
+    if (error) throw error;
+    router.push({ name: "Home" });
+  } catch (error) {
+    errorMessage.value = `Error: ${error.message}`;
+    setTimeout(() => {
+      errorMessage.value = false;
+    }, 3000);
+  }
+};
 
-// 6. add-to-do function will receive 2 params/arguments that will tak a taskTitle and a taskDescription and the body of this async function will call the taskStore that calls the addTask function from the store that pushes the info of the task to the backEnd. This is possible by passing the 2 param/arguments that will be passed by the user from the inputs within the NewTask Component.
-async function addTaskTodo(task) {
-  await taskStore.addTask(task.title, task.description, task.group);
-  readFromStore();
-}
+const addNEwTask = () => {
+  data.value.taskTitle.push({
+    id: uid(),
+    task: "",
+    descrpition: "",
+    date: "",
+  });
+};
 
-//7.1-customEvent will fire an async function that will take in 1 param/argument. On the body of this function the param/argument will be used to define 2 constants. 1 of this constants will take care of setting the boolean value to the opposite of the value that checks wether this task is_complete. 1 of this constants will take of calling the id of this specific task in order to call the right id.
-async function checkTask(task) {
-  const saveBoolean = !task.is_complete;
-  const saveId = task.id;
-  await taskStore.checkStatus(saveBoolean, saveId);
-  readFromStore();
-}
+const deleteTask = (id) => {
+  if (data.value.taskTitle.length > 1) {
+    data.value.taskTitle = data.value.taskTitle.filter(
+      (task) => task.id !== id
+    );
+    return;
+  }
+  errorMessage.value = "Need to have one task minimum";
+  setTimeout(() => {
+    errorMessage.value = false;
+  }, 3000);
+};
 
-//7.2-customEvent will fire an asynf function that will take in 1 param/argument. This async function's body will be used to call the deleteTaskmethod which will take the param/argument's id in order to delete the task. This function needs to call the function mentioned on hint4.
-async function deleteTask(task) {
-  const taskId = task.id;
-  await taskStore.deleteTask(taskId);
-  readFromStore();
-}
+const updateList = async () => {
+  try {
+    const { error } = await supabase
+      .from("lists")
+      .update({
+        listName: data.value.listName,
+        taskTitle: data.value.taskTitle,
+      })
+      .eq("id", currentId);
 
-//7.3-customEvent will fire an async function that will take in 1 param/argument. this async function's body will be used to take in 2 constants. 1 constant will take in the param/argument newValue. 1 constant will be used to get the param/argument oldValue id. These 2 constants will be sent to the backend via the useTaskStore which holds an editTask method. This function needs to call the function mentioned on hint4.
+    if (error) throw error;
+    edit.value = false;
+    statusMessage.value = "List updated!";
 
-async function editTask(task) {
-  const newTitle = task.newTitle;
-  const newDescription = task.newDescription;
-  const id = task.oldValue.id;
-  await taskStore.editTask(newTitle, newDescription, id);
-  readFromStore();
-}
+    setTimeout(() => {
+      statusMessage.value = false;
+    }, 3000);
+  } catch (error) {
+    errorMessage.value = `Error: ${error.message}`;
+    setTimeout(() => {
+      errorMessage.value = false;
+    }, 3000);
+  }
+};
 </script>
 
 <style scoped>
@@ -92,6 +181,9 @@ async function editTask(task) {
   padding: 0;
   margin: 0;
   background-color: antiquewhite;
+}
+.icon {
+  width: 50px;
 }
 #homeContainer {
   display: flex;

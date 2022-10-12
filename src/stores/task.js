@@ -2,59 +2,44 @@ import { defineStore } from "pinia";
 import { supabase } from "../supabase";
 import { useUserStore } from "./user";
 
-export const useTaskStore = defineStore("tasks", {
+export const useTaskStore = defineStore("lists", {
   state: () => ({
     tasks: null,
   }),
   actions: {
-    async fetchTasks() {
-      const { data: tasks } = await supabase
-        .from("tasks")
-        .select("*")
-        .order("id", { ascending: false });
-      this.tasks = tasks;
-      return this.tasks;
-    },
     async fetchLists() {
       const { data: lists } = await supabase
         .from("lists")
         .select("*")
         .order("id", { ascending: false });
-      this.lists = lists;
+      this.lists = tasks;
       return this.lists;
     },
 
     //  Add Tasks
-    async addTask(title, description) {
-      const { data, error } = await supabase.from("tasks").insert([
+    async addList(listName, taskTitle) {
+      const { data, error } = await supabase.from("lists").insert([
         {
           user_id: useUserStore().user.id,
-          title: title,
-          is_complete: false,
-          description: description,
+          listName: listName,
+          taskTitle: taskTitle,
         },
       ]);
     },
-    //  Status
-    async checkStatus(check, id) {
-      const { data, error } = await supabase
-        .from("tasks")
-        .update({ is_complete: check })
-        .match({ id: id });
-    },
+
     //  Delete
-    async deleteTask(id) {
+    async deleteList(id) {
       const { data, error } = await supabase
-        .from("tasks")
+        .from("lists")
         .delete()
         .match({ id: id });
     },
 
     //  Edit
-    async editTask(title, description, id) {
+    async editList(listName, taskTitle, id) {
       const { data, error } = await supabase
-        .from("tasks")
-        .update({ title: title, description: description })
+        .from("lists")
+        .update({ listName: listName, taskTitle: taskTitle })
         .match({ id: id });
     },
   },

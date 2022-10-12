@@ -2,17 +2,21 @@
   <div id="homeContainer">
     <NewNav />
     <Date />
-    <div id="lists">
-      <div id="listItem">
-        <TransitionGroup name="listTran">
-          <ListItem
-            id="item"
-            v-for="(item, index) in groupArray"
-            :key="index"
-            :group="item"
-        /></TransitionGroup>
+    <div class="noData" v-if="dataLoaded">
+      <div class="noLists" v-if="data.length === 0">
+        <h1>No lists created, let's create one!</h1>
+        <RouterLink to="/create"> 🧡</RouterLink>
       </div>
-      <NewList id="newList" @childNewGroup="addGroupTodo" />
+      <div v-else class="data">
+        <RouterLink
+          class="routeList"
+          v-for="(list, index) in data"
+          :key="index"
+          :to="{ name: 'List-View', params: { listId: list.id } }"
+        >
+          <h1>{{ list.listName }}</h1>
+        </RouterLink>
+      </div>
     </div>
     <Footer />
   </div>
@@ -20,42 +24,29 @@
 
 <script setup>
 import { ref } from "vue";
+import { supabase } from "../supabase";
 import { useTaskStore } from "../stores/task";
 import NewNav from "../components/NewNav.vue";
 import Date from "../components/Date.vue";
 import Footer from "../components/Footer.vue";
-import NewList from "../components/NewList.vue";
-import ListItem from "../components/ListItem.vue";
 
-const taskStore = useTaskStore();
+const data = ref([]);
+const dataLoaded = ref(null);
 
-const groupArray = ref([]);
-
-async function readFromStore() {
-  groupArray.value = await taskStore.fetchTasks();
-  // console.log(groupArray.value[0].group);
-  groupArray.value = extractGroups(groupArray);
-}
-readFromStore();
-
-async function addGroupTodo(task) {
-  await taskStore.addGroup(task.group);
-  readFromStore();
-}
-
-function extractGroups(extract) {
-  let arrayResult = [];
-  for (let i = 0; i < extract.value.length; i++) {
-    arrayResult[i] = extract.value[i].group;
+const getData = async () => {
+  try {
+    const { data: lists, error } = await supabase.from("lists").select("*");
+    if (error) throw error;
+    data.value = lists;
+    dataLoaded.value = true;
+  } catch (error) {
+    console.warn(error.message);
   }
-  //console.log(arrayResult);
-  arrayResult = [...new Set(arrayResult)];
-  //console.log(arrayResult);
-  return arrayResult;
-}
+};
+getData();
 </script>
 
-<style>
+<style scoped>
 * {
   font-family: "Roboto Mono", monospace;
   padding: 0;
