@@ -1,0 +1,71 @@
+.swal2-popup {
+  font-size: 0.8rem;
+  background: "antiquewhite";
+}
+.swal2-title {
+  font-weight: 300;
+  background: "antiquewhite";
+}
+
+/* @import "./base.css"; */
+
+/* #app {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+
+  font-weight: normal;
+}
+
+a,
+.green {
+  text-decoration: none;
+  color: hsla(160, 100%, 37%, 1);
+  transition: 0.4s;
+}
+
+@media (hover: hover) {
+  a:hover {
+    background-color: hsla(160, 100%, 37%, 0.2);
+  }
+}
+
+@media (min-width: 1024px) {
+  body {
+    display: flex;
+    place-items: center;
+  }
+
+  #app {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 0 2rem;
+  }
+} */
+/*
+body{#6c5a40;
+  color:
+  color: #807d48;
+  color:  #79351f;
+  color: #5a3d2d;
+  color: #5a3d2b;
+color: #6c4040 ;
+color: #bc4324;
+color: #cf4e3e;
+color: #c42727 ;
+color: #e77725;
+color: #dd7210;
+color: #e5771e;
+color: #cf7815 ;
+color: #f3a127;
+color: #f4a127;
+color: #d2864c ;
+color: #fcbe6b;
+color: #feecb7;
+color: #feebb3;
+color: #fadfb0;
+color: #406c6c;
+color: #74c8ae;
+color: #63a1a5;
+
+} */
