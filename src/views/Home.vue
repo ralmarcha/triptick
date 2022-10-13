@@ -4,8 +4,9 @@
     <Date />
     <div v-if="dataLoaded" class="noData">
       <div v-if="data.length === 0" class="noLists">
-        <h1>No lists created, let's create one!</h1>
-        <RouterLink to="/create"> 🧡</RouterLink>
+        <RouterLink class="heart" to="/create"
+          ><h2>No lists created, let's create one! 🧡</h2>
+        </RouterLink>
       </div>
       <div v-else class="data">
         <ul class="listItem">
@@ -17,6 +18,14 @@
             </RouterLink>
           </li>
         </ul>
+
+        <div class="newList">
+          <h2>
+            Let's create a New List!<RouterLink class="heart" to="/create">
+              🧡</RouterLink
+            >
+          </h2>
+        </div>
       </div>
     </div>
     <Footer />
@@ -59,6 +68,17 @@ getData();
 #homeContainer {
   display: flex;
   flex-direction: column;
+  margin: 20px 200px;
+}
+
+.heart {
+  text-decoration: none;
+  font-size: 22px;
+}
+h2 {
+  color: #79351f;
+  text-align: center;
+  margin-top: 30px;
 }
 #lists {
   width: 80%;

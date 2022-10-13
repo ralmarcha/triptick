@@ -1,6 +1,7 @@
 <template>
   <div id="homeContainer">
     <NewNav />
+
     <div class="taskList">
       <div v-if="statusMessage || errorMessage">
         <p>{{ errorMessage }}</p>
@@ -8,67 +9,79 @@
       </div>
     </div>
 
-    <div v-if="dataLoaded">
-      <div>
+    <div v-if="dataLoaded" class="dataLoaded">
+      <div class="titleList">
+        <div class="newInputs">
+          <input v-if="edit" type="text" v-model="data.listName" />
+          <h1 v-else>{{ data.listName }}</h1>
+        </div>
+
         <div class="edit" @click="editMode">
-          <img class="icon" src="../assets/images/edit.svg" alt="edit icon" />
+          <img class="icon" src="../assets/images/edit.png" alt="edit icon" />
           <img
             @click="deleteList"
             class="icon"
-            src="../assets/images/delete.svg"
+            src="../assets/images/delete.png"
+            alt="delete icon"
+          />
+        </div>
+      </div>
+
+      <div class="editMode">
+        <div
+          class="tasksView"
+          v-for="(item, index) in data.taskTitle"
+          :key="index"
+        >
+          <div class="name">
+            <label for="task-name">Place</label>
+            <input
+              v-if="edit"
+              id="task"
+              v-model="item.task"
+              type="text"
+              placeholder="Enter a title"
+            />
+            <h3 v-else>{{ item.task }}</h3>
+          </div>
+          <div class="name">
+            <label for="description">Description</label>
+            <input
+              v-if="edit"
+              id="description"
+              v-model="item.description"
+              type="text"
+              placeholder="Enter a description"
+            />
+            <h3 v-else>{{ item.description }}</h3>
+          </div>
+          <div class="name">
+            <label for="date">Date</label>
+            <input v-if="edit" id="date" v-model="item.date" type="date" />
+            <h3 v-else>{{ item.date }}</h3>
+          </div>
+          <img
+            @click="deleteTask(item.id)"
+            v-if="edit"
+            class="icon"
+            src="../assets/images/delete.png"
             alt="delete icon"
           />
         </div>
 
-        <div class="newInputs">
-          <input v-if="edit" type="text" v-model="data.listName" />
-          <h1>{{ data.listName }}</h1>
-        </div>
-      </div>
-
-      <div
-        class="tasksView"
-        v-for="(item, index) in data.taskTitle"
-        :key="index"
-      >
-        <div>
-          <label for="task-name">Task</label>
-          <input
-            v-if="edit"
-            id="task"
-            v-model="item.task"
-            type="text"
-            placeholder="Enter a title"
-          />
-          <h3 v-else>{{ item.task }}</h3>
-        </div>
-        <div>
-          <label for="description">Description</label>
-          <input
-            v-if="edit"
-            id="description"
-            v-model="item.description"
-            type="text"
-            placeholder="Enter a description"
-          />
-          <h3 v-else>{{ item.description }}</h3>
-        </div>
-        <div>
-          <label for="date">Date</label>
-          <input v-if="edit" id="date" v-model="item.date" type="date" />
-          <h3 v-else>{{ item.date }}</h3>
-        </div>
-        <img
-          @click="deleteTask(item.id)"
+        <button
+          @click="addNEwTask"
           v-if="edit"
-          class="icon"
-          src="../assets/images/delete.svg"
-          alt="delete icon"
-        />
+          type="button"
+          class="addTaskButton"
+        >
+          Add New Place
+        </button>
       </div>
-      <button @click="addNEwTask" v-if="edit" type="button">Add task</button>
-      <button @click="updateList" v-if="edit" type="button">Update List</button>
     </div>
+    <button class="addListButton" @click="updateList" v-if="edit" type="button">
+      Update List
+    </button>
     <Footer />
   </div>
 </template>
@@ -180,15 +193,92 @@ const updateList = async () => {
   font-family: "Roboto Mono", monospace;
   padding: 0;
   margin: 0;
-  background-color: antiquewhite;
+}
+.editMode {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.dataLoaded {
+  border: 1px solid grey;
+}
+.addTaskButton {
+  height: 50px;
+  margin: 10px 0;
+  max-width: 90px;
+  padding: 5px;
+  border-radius: 10px;
+  border: 1px solid #203636;
+  background-color: lightsteelblue;
+  color: #203636;
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.addListButton {
+  margin-top: 40px;
+  height: 60px;
+  max-width: 100px;
+  padding: 5px;
+  border-radius: 10px;
+  border: 1px solid #203636;
+  background-color: darkgrey;
+  color: #203636;
+  font-size: 18px;
+  font-weight: bold;
+  letter-spacing: 1px;
 }
 .icon {
-  width: 50px;
+  width: 40px;
+  cursor: pointer;
+}
+.taskList {
+  margin-top: 40px;
+}
+.titleList {
+  display: flex;
+  flex-direction: row;
+  min-width: 500px;
+  justify-content: space-between;
+  height: 100px;
+  background-color: darkgrey;
+}
+.newInputs h1 {
+  text-transform: uppercase;
+}
+.edit {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.tasksView {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-top: 20px;
+  background-color: lightsteelblue;
+  width: 100%;
+  min-height: 60px;
+}
+label {
+  vertical-align: top;
+  font-size: small;
+  font-style: italic;
+}
+.name {
+  display: flex;
+  flex-direction: column;
+}
+footer {
+  margin-top: 150px;
 }
 #homeContainer {
   display: flex;
   flex-direction: column;
-  margin: 10px 10px 20px 200px;
+  margin: 20px 100px;
 }
 #tasks {
   display: grid;
