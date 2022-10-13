@@ -30,6 +30,12 @@
             v-model="password"
             id="password"
           />
+          <i
+            :class="passwordIconClick"
+            @click.prevent="hidePassword = !hidePassword"
+            class="material-icons iconEye"
+            >{{ icon }}</i
+          >
           <p v-if="errorMsg" class="errorInput">
             {{ errorMsg }}
           </p>
@@ -62,42 +68,39 @@
 <script setup>
 import { ref, computed } from "vue";
 import PersonalRouter from "./PersonalRouter.vue";
-import { supabase } from "../supabase";
 import { useRouter } from "vue-router";
 import { useUserStore } from "../stores/user";
-import { storeToRefs } from "pinia";
 
-// Route Variables
 const route = "/auth/sign-up";
 const buttonText = "Sign Up";
 
-// Input Fields
 const email = ref("");
 const password = ref("");
 
-// Error Message
 const errorMsg = ref("");
 
-//Show hide password variables
+const icon = ref("visibility_off");
+const passwordIconClick = computed(() =>
+  hidePassword.value
+    ? (icon.value = "visibility_off")
+    : (icon.value = "visibility")
+);
+
 const passwordFieldType = computed(() =>
   hidePassword.value ? "password" : "text"
 );
 const hidePassword = ref(true);
 
-// Router to push user once SignedIn to the HomeView
 const redirect = useRouter();
 
-// Arrow function to Signin user to supaBase
 const signIn = async () => {
   try {
-    // calls the user store and send the users info to backend to logIn
     await useUserStore().signIn(email.value, password.value);
-    // redirects user to the homeView
+
     redirect.push({ path: "/" });
   } catch (error) {
-    // displays error message
     errorMsg.value = "E-mail & Password required";
-    // hides error message
+
     setTimeout(() => {
       errorMsg.value = null;
     }, 5000);
@@ -124,6 +127,16 @@ test
 
 .icon {
   width: 100px;
+}
+.iconEye {
+  cursor: pointer;
+  color: #79351f;
+  position: absolute;
+  z-index: 1;
+  top: 85px;
+  right: 40px;
+  font-size: 20px;
+  opacity: 0.8;
 }
 
 #travel {
@@ -157,7 +170,6 @@ test
   justify-content: center;
   width: 350px;
   height: 300px;
-
   overflow: hidden;
   z-index: 1;
 }
@@ -214,13 +226,16 @@ input:focus::placeholder {
   -webkit-transition: 0.5s;
   transition: 0.5s;
 }
+
 #signUp {
   color: #5a3d2b;
   font-weight: 600;
 }
+
 #signUp:hover {
   text-decoration: underline;
 }
+
 button {
   margin-top: 30px;
   align-items: center;
@@ -241,14 +256,25 @@ button:hover {
   transform: translateY(-3px);
   box-shadow: 0 6px 6px 0 rgba(0, 0, 0, 0.2);
 }
+
 @media screen and (max-width: 768px) {
-  .rigth {
-    display: none;
-  }
   * {
     margin: 0;
     padding: 0;
   }
+
+  .iconEye {
+    display: none;
+  }
+
+  .icon {
+    margin-top: 90px;
+    width: 80px;
+  }
+  .rigth {
+    display: none;
+  }
+
   .left {
     margin-left: 20px;
     justify-content: center;
@@ -262,15 +288,14 @@ button:hover {
     align-items: center;
     font-size: 0.8rem;
   }
-  .icon {
-    width: 80px;
-  }
+
   .logo {
     width: 250px;
   }
   #travel {
     width: 150px;
     align-items: center;
+    margin-top: 0;
   }
   input {
     width: 70%;
@@ -286,6 +311,14 @@ button:hover {
   .logo {
     width: 300px;
   }
+  .iconEye {
+    top: 60px;
+  }
+
+  .container {
+    width: 100%;
+  }
+
   #travel {
     width: 250px;
     align-items: center;

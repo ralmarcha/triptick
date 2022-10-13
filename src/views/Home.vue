@@ -2,20 +2,21 @@
   <div id="homeContainer">
     <NewNav />
     <Date />
-    <div class="noData" v-if="dataLoaded">
-      <div class="noLists" v-if="data.length === 0">
+    <div v-if="dataLoaded" class="noData">
+      <div v-if="data.length === 0" class="noLists">
         <h1>No lists created, let's create one!</h1>
         <RouterLink to="/create"> 🧡</RouterLink>
       </div>
       <div v-else class="data">
-        <RouterLink
-          class="routeList"
-          v-for="(list, index) in data"
-          :key="index"
-          :to="{ name: 'List-View', params: { listId: list.id } }"
-        >
-          <h1>{{ list.listName }}</h1>
-        </RouterLink>
+        <ul class="listItem">
+          <li class="routeList" v-for="(list, index) in data" :key="index">
+            <RouterLink
+              :to="{ name: 'List-View', params: { listId: list.id } }"
+            >
+              <h1>{{ list.listName }}</h1>
+            </RouterLink>
+          </li>
+        </ul>
       </div>
     </div>
     <Footer />
@@ -25,7 +26,6 @@
 <script setup>
 import { ref } from "vue";
 import { supabase } from "../supabase";
-import { useTaskStore } from "../stores/task";
 import NewNav from "../components/NewNav.vue";
 import Date from "../components/Date.vue";
 import Footer from "../components/Footer.vue";
@@ -68,6 +68,53 @@ getData();
   margin-bottom: 40px;
   margin-top: 40px;
 }
+.routeList {
+  padding: 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 1.6rem;
+  background-color: #fcbe6b;
+  width: 200px;
+  height: 150px;
+  border-radius: 10px;
+  outline: 1px solid #6c5a40;
+  box-shadow: 3px 3px 10px#6c5a40;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.routeList:hover {
+  transform: scale(1.1);
+  transition: 1s;
+  transition-timing-function: ease;
+}
+ul {
+  list-style-type: none;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 40px;
+}
+
+li {
+  text-align: center;
+  margin-bottom: 40px;
+  margin-top: 40px;
+}
+
+li a {
+  text-decoration: none;
+  background-color: #fcbe6b;
+  font-weight: 300;
+  color: #6c5a40;
+  text-align: center;
+  font-size: 18px;
+}
+
 #listItem {
   display: flex;
   flex-direction: row;

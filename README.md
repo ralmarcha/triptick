@@ -14,8 +14,6 @@ Develop the final project running on Vue 3 with the composition API, Pinia as a 
 
 - NewTask Component
 - TaskItem Component : remove, edit & done
-  https://supabase.com/docs/reference/javascript/update
-  https://supabase.com/docs/reference/javascript/delete
 
 ### 05/10/2022
 
@@ -72,12 +70,12 @@ Develop the final project running on Vue 3 with the composition API, Pinia as a 
 - Refactoring
 - Deployment
 
-### 11/10/2022
+### 12/10/2022
 
-**_Targets_**
+**_Completed_**
 
-- Create New Lists
-- Listed by group !!!
+- Create New Lists, adding & removing lists, adding & removing tasks, adding date, routers to each list.
+- Styles pending!!
 
-DEPLOYMENT: https://final-project-three-cyan.vercel.app/auth/login
+DEPLOYMENT: https://triptick.vercel.app/auth/login
 SLIDES:
